@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",             // Changed from nodenext for easier testing
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,                   // Keeps your high quality bar
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "noUncheckedIndexedAccess": true, // Kept this! Great for catching array errors
+    "types": ["node", "chai"]         // Ensure these types are loaded
+  },
+  "include": ["src/**/*", "features/**/*"]
+}
