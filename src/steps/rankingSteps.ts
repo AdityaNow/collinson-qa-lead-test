@@ -1,6 +1,6 @@
 import { Given, When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { WeatherService, ActivityResult, ACTIVITY_TYPES } from '../api/WeatherService';
+import { WeatherService, ActivityResult } from '../api/WeatherService';
 
 // State management - stores test context between steps
 let cityInput: string;
@@ -79,15 +79,18 @@ Then('each result should have a non-empty reasoning string', function () {
 
 Then('the date should be within the next 7 days', function () {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset to start of day
+    today.setUTCHours(0, 0, 0, 0); // Reset to start of day in UTC
     
     const sevenDaysFromNow = new Date(today);
-    sevenDaysFromNow.setDate(today.getDate() + 7);
+    sevenDaysFromNow.setUTCDate(today.getUTCDate() + 7);
 
     activitiesResponse.forEach((result, index) => {
-        const resultDate = new Date(result.date);
-        expect(resultDate, `Date at index ${index} should be on or after today`).to.be.at.least(today, 'Date should be today or in the future');
-        expect(resultDate, `Date at index ${index} should be within 7 days`).to.be.at.most(sevenDaysFromNow, 'Date should be within 7 days');
+        const resultDate = new Date(result.date + 'T00:00:00Z'); // Parse as UTC date
+        resultDate.setUTCHours(0, 0, 0, 0);
+        
+        // Allow dates from today up to 7 days from today
+        expect(resultDate.getTime(), `Date ${result.date} at index ${index} should be on or after today`).to.be.at.least(today.getTime());
+        expect(resultDate.getTime(), `Date ${result.date} at index ${index} should be within 7 days`).to.be.at.most(sevenDaysFromNow.getTime());
     });
 });
 
@@ -124,21 +127,24 @@ Then('the dates should start from tomorrow or today', function () {
     if (!firstDateStr) {
         throw new Error('First date string is undefined');
     }
-    const firstDate = new Date(firstDateStr);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    const firstDate = new Date(firstDateStr + 'T00:00:00Z');
+    firstDate.setUTCHours(0, 0, 0, 0);
     
-    // First date should be today or tomorrow
-    const isToday = firstDate.getTime() === today.getTime();
-    const isTomorrow = firstDate.getTime() === tomorrow.getTime();
-    expect(isToday || isTomorrow, `First date ${firstDateStr} should be today or tomorrow`).to.be.true;
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setUTCDate(today.getUTCDate() + 1);
+    
+    // First date should be today or tomorrow (within 1 day)
+    const daysDiff = Math.round((firstDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    expect(daysDiff, `First date ${firstDateStr} should be today (0) or tomorrow (1), but got ${daysDiff}`).to.be.oneOf([0, 1]);
 });
 
 Then('the system should handle the error gracefully', function () {
     // Error should have been caught (not thrown, causing test failure)
-    expect(errorOccurred || activitiesResponse.length === 0, 'System should handle error gracefully').to.be.true;
+    // Either an error was caught and stored, or empty result was returned
+    const handledGracefully = errorOccurred !== null || activitiesResponse.length === 0;
+    expect(handledGracefully, `System should handle error gracefully. Error: ${errorOccurred?.message || 'none'}, Response length: ${activitiesResponse.length}`).to.be.true;
 });
 
 Then('return an appropriate error response or empty result', function () {
@@ -160,7 +166,7 @@ When('the system retrieves autocomplete suggestions', async function () {
     expect(suggestionsResponse).to.not.be.undefined;
 });
 
-Then('the autocomplete suggestions should include {string}', function (expectedCity: string) {
+Then('the suggestions should include {string}', function (expectedCity: string) {
     expect(suggestionsResponse, 'Suggestions should be an array').to.be.an('array');
     expect(suggestionsResponse, `Suggestions should include "${expectedCity}"`).to.include(expectedCity);
 });

@@ -9,20 +9,26 @@ This repository contains a complete BDD (Behavior-Driven Development) test solut
 ```
 .
 ├── features/
-│   └── activity_ranking.feature      # Gherkin BDD scenarios
+│   └── activity_ranking.feature      # Gherkin BDD scenarios (main test file - equivalent to .spec.ts files)
 ├── src/
 │   ├── api/
 │   │   └── WeatherService.ts         # Service layer for weather API integration
 │   ├── steps/
-│   │   └── rankingSteps.ts           # Cucumber step definitions
+│   │   └── rankingSteps.ts           # Cucumber step definitions (implements the test steps)
 │   └── support/                      # Test support files
 ├── tests/                            # Additional test files (if needed)
 ├── reports/                          # Cucumber HTML reports
 ├── manual-test-script.md             # Comprehensive manual test script
+├── BDD_STYLE_GUIDE.md                # Style guide for standardizing Given/When/Then steps
+├── STEP_TEMPLATES.md                 # Quick reference templates for common step patterns
 ├── cucumber.js                       # Cucumber configuration
 ├── package.json                      # Dependencies and scripts
 └── README.md                         # This file
 ```
+
+**Note:** In BDD/Cucumber, the `features/*.feature` files are the main test files (equivalent to `.spec.ts` or `.test.ts` files in traditional testing frameworks). They contain test scenarios written in plain English (Gherkin syntax), while `src/steps/*.ts` files contain the implementation code that executes those scenarios.
+
+**For Team Consistency:** See `BDD_STYLE_GUIDE.md` for standards on writing Given/When/Then steps to ensure consistency across team members from different geographic regions.
 
 ## Approach
 
