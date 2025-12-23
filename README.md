@@ -220,12 +220,3 @@ If given more time, I would add:
 5. **Parallel Execution**: Run scenarios in parallel for faster execution
 6. **Visual Regression**: If testing UI, add visual regression testing
 7. **API Contract Testing**: Validate API contracts and schema
-
-## Contact
-
-For questions or feedback about this solution, please reach out through the repository issues or contact the repository owner.
-
----
-
-**Note**: This solution was created as part of a QA Lead assessment. It demonstrates BDD thinking, test automation skills, and the ability to create comprehensive test coverage within time constraints.
-
